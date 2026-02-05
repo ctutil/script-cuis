@@ -1,0 +1,60 @@
+#!/bin/sh
+set -e
+
+# Check for help option
+if [ "$1" = "-help" ]; then
+    echo "Usage: cuis [options] [arguments] [<*.st files>]"
+    echo "Options:"
+    echo "  -help         Print this help message"
+    echo "  -clear-cache  Clear the cache"
+    echo "  -head         Use head mode"
+    echo "  -print-env    Print all environment variables before starting the vm"
+    exit 0
+fi
+
+export SCUIS_PWD=$(pwd)
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SCUIS_PWD/lib
+
+export SCUIS_HEAD="no"
+# Check if -head is provided
+if [ "$1" = "-head" ]; then
+    export SCUIS_HEAD="yes"
+    shift
+fi
+
+export SCUIS_CLEAR_CACHE="no"
+if [ "$1" = "-clear-cache" ]; then
+    export SCUIS_CLEAR_CACHE="yes"
+    shift
+fi
+
+export SCUIS_PRINT_ENV="no"
+if [ "$1" = "-print-env" ]; then
+    export SCUIS_PRINT_ENV="yes"
+    shift
+fi
+
+# Collect remaining arguments into CUIS_SARGS
+export SCUIS_VM_ARGS="$*"
+
+SCUIS_APPDIR=$APPDIR
+#echo "sCuis appdir: $SCUIS_APPDIR"
+# read
+
+export SCUIS_STATE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/cuis"
+mkdir -p "$SCUIS_STATE_DIR"
+
+# Initial setup, if not exists
+if [ ! -f "$SCUIS_STATE_DIR/startVm" ]; then
+#    echo "Overwriting cache..."
+    cp -r "$SCUIS_APPDIR/usr/share/cuis/"* "$SCUIS_STATE_DIR/"
+fi
+
+if [ "$SCUIS_CLEAR_CACHE" = "yes" ]; then
+    echo "Clearing cache..."
+    rm -rf $SCUIS_STATE_DIR
+    exit
+fi
+
+exec "$SCUIS_STATE_DIR/startVm" $SCUIS_VM_ARGS
+
