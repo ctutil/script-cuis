@@ -1,6 +1,6 @@
-'From Cuis7.2 [latest update: #6897] on 1 February 2026 at 8:02:29 pm'!
+'From Cuis7.2 [latest update: #6897] on 7 February 2026 at 8:55:33 pm'!
 'Description '!
-!provides: 'SCuis' 1 21!
+!provides: 'SCuis' 1 49!
 !requires: 'CtuMem' 1 66 nil!
 SystemOrganization addCategory: #scuis!
 
@@ -34,7 +34,7 @@ processContent: scriptContent
 processRequirement: aLine
 	Compiler evaluate: aLine.! !
 
-!SCuis methodsFor: 'evaluation' stamp: 'ct 2/1/2026 20:02:21'!
+!SCuis methodsFor: 'evaluation' stamp: 'ct 2/7/2026 20:52:31'!
 evaluate
 	" I evaluate the given script (only the first script is evalued) "
 	| headMode |
@@ -45,7 +45,7 @@ evaluate
 		| args script |
 
 		args := SCuisEnv ARGS.	
-		(args = nil) ifFalse: [
+		((args = nil) or: (args = '')) ifFalse: [
 			| nextLine content |
 			content := ''.
 			script := args asFileEntry readStream.
@@ -71,16 +71,121 @@ evaluate
 			]
 			ensure: [
 				script ifNotNil: [script close].
+			]
+		].
+	
+	 	(args = '') ifTrue: [  "no ARGS given"
+			| isAdoc |
+			
+			isAdoc := CtuMem getenv: 'SCUIS_ADOC'.
+			
+			(isAdoc ~= '') ifTrue: [
+				" if called from an asciidoc document "
+				self evaluateAsciidoc: headMode.
 			].
 		].
 			
 	] on: Error do: [ :err | 
+		(headMode = 'yes') ifTrue: [
+			self halt.
+		].
+		
 		CtuMem print: (err messageText); nl.
 	].
 
 	(headMode = 'no') ifTrue: [
 		Smalltalk quit.	
 	].! !
+
+!SCuis methodsFor: 'asciidoc - private' stamp: 'ct 2/7/2026 19:00:39'!
+extractAsciidoc: adocName sourceBlock: sourceId
+	| adocFile foundBlockLines isInside line scuisIdLine isCuisSource |
+	
+	foundBlockLines := OrderedCollection new.
+	scuisIdLine := ''.
+	isInside := false.
+	isCuisSource := false.
+		
+	adocFile := ((SCuisEnv PWD), '/', adocName) asFileEntry readStream.
+
+	[	
+		[adocFile atEnd] whileFalse: [
+			line := adocFile nextLine.
+
+			isInside ifTrue: [
+				(scuisIdLine = sourceId) ifTrue: [
+					isCuisSource := true.
+				].
+			
+				(line = '----') ifTrue: [
+					isCuisSource := false.
+					isInside := false.	
+				].
+			
+				isCuisSource ifTrue: [
+					foundBlockLines add: line.
+				].
+			].
+
+			(line = '[source,smalltalk]') ifTrue: [
+				line := adocFile nextLine.		"Should be: ----"	
+				line := adocFile nextLine.
+				scuisIdLine := line.			
+				isInside := true.
+			].
+		].
+	] ensure: [	
+		adocFile close.
+	].
+
+	^foundBlockLines.! !
+
+!SCuis methodsFor: 'asciidoc' stamp: 'ct 2/7/2026 20:55:26'!
+evaluateAsciidoc: headMode
+	"Should come with the env variable SCUIS_ADOC=<file>.adoc,<source block id>
+	  In the first row of the asciidoc source block add the id like scuis=<source block id>
+	
+	  Example asciidoc (the file name is test.adoc):
+	  [source,smalltalk]
+	  ----
+	  scuis=c1
+	  ----
+	
+	  [source,bash]
+	  ----
+	  SCUIS_ADOC=test,c1 cuis
+	  ----
+	"
+	| adocName sourceId env foundBlockLines |
+	
+	env := (CtuMem getenv: 'SCUIS_ADOC') findTokens: ','.
+	
+	adocName := (env at: 1), '.adoc'.
+	sourceId := 'scuis=', (env at: 2).
+	foundBlockLines := self extractAsciidoc: adocName sourceBlock: sourceId.
+	
+	(headMode = 'yes') ifFalse: [
+		| content |
+		content := ''.
+		
+		foundBlockLines do: [ :line |
+			(line beginsWith: 'SCuis require:') ifTrue: [
+			self processRequirement: line.
+			] ifFalse: [
+				content := content, line.
+			].	
+		].
+	
+		self processContent: content.
+	] ifTrue: [
+		| content |
+		content := ''.
+		foundBlockLines do: [ :line |
+			content := content, line, (String lfString).
+		].
+		Workspace new contents: content; openLabel: 'Asciidoc code block'.
+	].
+	! !
 
 !SCuis class methodsFor: 'requirements' stamp: 'ct 2/1/2026 14:29:43'!
 require: aFeatureName

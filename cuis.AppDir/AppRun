@@ -6,9 +6,15 @@ if [ "$1" = "-help" ]; then
     echo "Usage: cuis [options] [arguments] [<*.st files>]"
     echo "Options:"
     echo "  -help         Print this help message"
+    echo "  -version      Create version"
     echo "  -clear-cache  Clear the cache"
     echo "  -head         Use head mode"
     echo "  -print-env    Print all environment variables before starting the vm"
+    exit 0
+fi
+
+if [ "$1" = "-version" ]; then
+    echo "v0.2.0b"
     exit 0
 fi
 
