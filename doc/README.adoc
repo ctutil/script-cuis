@@ -1,0 +1,89 @@
+= Script Cuis
+:source-highlighter: prettify
+:toc:
+:icons: font
+
+== What is this
+
+Script Cuis is an appimage version of Cuis Smalltalk. The goal is to have such a usage method like we have at tratidional scripting languages like perl or python.
+
+Smalltalk has a very different environment: Typically if you want to run something in Smalltalk, you have to bring up its environment with windows, UI, load packages manually, print output to Transcript, etc. (there's a headless mode however, but it has its back draws)
+
+But wouldn't it be nice to have a `cuis` command on you classpath and just call your script, like you have a `hello.st` and just type `./hello.st` and your program runs and exists. Script Cuis does exactly this.
+
+The other main part is to be embeddable. Do you know Jupyter, the Notebook web-based interactive python platform? Well Script Cuis provides a similar functionality if you use it with IntelliJ and its Asciidoctor plugin.
+
+== Prerequisites
+
+The source repo contains all necessary scripts to be able to build
+the AppImage on your own.
+
+The Script Cuis' main package is `SCuis`. It depends on the https://github.com/ctutil/ctumem[`CtuMem`] library.
+
+The Cuis image in the AppImage already contains all necessary dependencies.
+
+The target platform is Linux currently.
+
+== Installation
+
+It is recommended to download the most recent `cuis-7.2.AppImage` from this repository.
+
+You can use this without any installation. Just make it executable with `chmod 755 cuis-7.2.AppImage`!
+
+It is recommended to create a symling: `ln -s cuis-7.2.AppImage cuis` and copy them to the classpath e.g. `/usr/local/bin`.
+
+== Usage
+
+=== Console mode
+
+If you have the `cuis` on your classpath you can create your scripts and just run it.
+
+The image contains the `CtuMem` library which provides basic functions to get environment variables and do some stdio operations.
+
+.For example
+[source,smalltalk]
+----
+#!/usr/bin/env cuis
+
+CtuMem print: 'Hello world'; nl.
+----
+
+Run it with:
+[source,bash]
+cuis hello.st
+
+If you need the Smalltalk infrastructure you can run it in `head mode`. This will bring up the Smalltalk IDE and show your script. After changing it you can save it easily back to the file.
+
+=== Asciidoc mode
+
+If you use IntelliJ with asciidoc plugin, you can use it like a Notebool.
+
+For example just open this document and run the following scripts:
+
+[source,smalltalk]
+----
+scuis=c2
+
+CtuMem print: 'Hi from Intellij'; nl.
+CtuMem print: 'This is fantastic'; nl.
+----
+
+Run it:
+[source,bash]
+----
+SCUIS_ADOC=README,c2 cuis
+----
+
+In the `smalltalk` block the first row should be the scuis id (`scuis=<a unique id>`).
+
+In the second block it is important to add the `SCUIS_ADOC` environment variable in the following way:
+
+`SCUIS_ADOC=<current asciidoc document without ext>,<scuis id>`
+
+If you use the `-head` parameter it will display the content of the block without executing it.
+
+Try it with head:
+[source,bash]
+----
+SCUIS_ADOC=README,c2 cuis -head
+----
