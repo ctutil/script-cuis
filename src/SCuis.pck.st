@@ -1,6 +1,6 @@
-'From Cuis7.2 [latest update: #6897] on 7 February 2026 at 8:55:33 pm'!
+'From Cuis7.2 [latest update: #6897] on 8 February 2026 at 4:13:55 pm'!
 'Description '!
-!provides: 'SCuis' 1 49!
+!provides: 'SCuis' 1 50!
 !requires: 'CtuMem' 1 66 nil!
 SystemOrganization addCategory: #scuis!
 
@@ -34,7 +34,7 @@ processContent: scriptContent
 processRequirement: aLine
 	Compiler evaluate: aLine.! !
 
-!SCuis methodsFor: 'evaluation' stamp: 'ct 2/7/2026 20:52:31'!
+!SCuis methodsFor: 'evaluation' stamp: 'ct 2/8/2026 16:13:38'!
 evaluate
 	" I evaluate the given script (only the first script is evalued) "
 	| headMode |
@@ -79,7 +79,7 @@ evaluate
 			
 			isAdoc := CtuMem getenv: 'SCUIS_ADOC'.
 			
-			(isAdoc ~= '') ifTrue: [
+			((isAdoc ~= '') and: (isAdoc notNil)) ifTrue: [
 				" if called from an asciidoc document "
 				self evaluateAsciidoc: headMode.
 			].
