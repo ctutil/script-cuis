@@ -1,6 +1,6 @@
-'From Cuis7.2 [latest update: #6897] on 8 February 2026 at 4:13:55 pm'!
+'From Cuis7.2 [latest update: #6897] on 18 February 2026 at 8:55:57 pm'!
 'Description '!
-!provides: 'SCuis' 1 50!
+!provides: 'SCuis' 1 51!
 !requires: 'CtuMem' 1 66 nil!
 SystemOrganization addCategory: #scuis!
 
@@ -34,12 +34,13 @@ processContent: scriptContent
 processRequirement: aLine
 	Compiler evaluate: aLine.! !
 
-!SCuis methodsFor: 'evaluation' stamp: 'ct 2/8/2026 16:13:38'!
+!SCuis methodsFor: 'evaluation' stamp: 'ct 2/18/2026 20:55:16'!
 evaluate
 	" I evaluate the given script (only the first script is evalued) "
-	| headMode |
+	| headMode daemonMode |
 
 	headMode := SCuisEnv HEAD.
+	daemonMode := SCuisEnv DAEMON.
 	
 	[ 
 		| args script |
@@ -93,7 +94,7 @@ evaluate
 		CtuMem print: (err messageText); nl.
 	].
 
-	(headMode = 'no') ifTrue: [
+	((headMode = 'no') and: (daemonMode = 'no')) ifTrue: [
 		Smalltalk quit.	
 	].! !
 
@@ -199,6 +200,10 @@ ARGS
 !SCuisEnv class methodsFor: 'as yet unclassified' stamp: 'ct 2/1/2026 13:57:10'!
 CLEAR_CACHE
 	^CtuMem getenv: 'SCUIS_CLEAR_CACHE'.! !
+
+!SCuisEnv class methodsFor: 'as yet unclassified' stamp: 'ct 2/18/2026 20:54:03'!
+DAEMON
+	^CtuMem getenv: 'SCUIS_DAEMON'.! !
 
 !SCuisEnv class methodsFor: 'as yet unclassified' stamp: 'ct 2/1/2026 13:58:03'!
 HEAD

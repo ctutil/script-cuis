@@ -8,13 +8,14 @@ if [ "$1" = "-help" ]; then
     echo "  -help         Print this help message"
     echo "  -version      Create version"
     echo "  -clear-cache  Clear the cache"
-    echo "  -head         Use head mode"
+    echo "  -head         Use head mode: this will show up the Smalltalk IDE"
+    echo "  -daemon       Use daemon mode: no exit at the end"
     echo "  -print-env    Print all environment variables before starting the vm"
     exit 0
 fi
 
 if [ "$1" = "-version" ]; then
-    echo "v0.2.1b"
+    echo "v0.2.2b"
     exit 0
 fi
 
@@ -25,6 +26,13 @@ export SCUIS_HEAD="no"
 # Check if -head is provided
 if [ "$1" = "-head" ]; then
     export SCUIS_HEAD="yes"
+    shift
+fi
+
+export SCUIS_DAEMON="no"
+# Check if -head is provided
+if [ "$1" = "-daemon" ]; then
+    export SCUIS_DAEMON="yes"
     shift
 fi
 
