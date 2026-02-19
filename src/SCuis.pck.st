@@ -1,6 +1,6 @@
-'From Cuis7.2 [latest update: #6897] on 18 February 2026 at 8:55:57 pm'!
+'From Cuis7.2 [latest update: #6897] on 19 February 2026 at 8:25:08 pm'!
 'Description '!
-!provides: 'SCuis' 1 51!
+!provides: 'SCuis' 1 52!
 !requires: 'CtuMem' 1 66 nil!
 SystemOrganization addCategory: #scuis!
 
@@ -34,7 +34,7 @@ processContent: scriptContent
 processRequirement: aLine
 	Compiler evaluate: aLine.! !
 
-!SCuis methodsFor: 'evaluation' stamp: 'ct 2/18/2026 20:55:16'!
+!SCuis methodsFor: 'evaluation' stamp: 'ct 2/19/2026 20:24:51'!
 evaluate
 	" I evaluate the given script (only the first script is evalued) "
 	| headMode daemonMode |
@@ -57,7 +57,7 @@ evaluate
 						(nextLine beginsWith: 'SCuis require:') ifTrue: [
 							self processRequirement: nextLine.
 						] ifFalse: [
-							content := content, nextLine.
+							content := content, (Character cr asString), nextLine.
 						].
 					].
 				].
