@@ -1,6 +1,6 @@
-'From Cuis7.2 [latest update: #6897] on 19 February 2026 at 8:25:08 pm'!
+'From Cuis7.2 [latest update: #6897] on 8 March 2026 at 11:45:38 am'!
 'Description '!
-!provides: 'SCuis' 1 52!
+!provides: 'SCuis' 1 53!
 !requires: 'CtuMem' 1 66 nil!
 SystemOrganization addCategory: #scuis!
 
@@ -34,7 +34,7 @@ processContent: scriptContent
 processRequirement: aLine
 	Compiler evaluate: aLine.! !
 
-!SCuis methodsFor: 'evaluation' stamp: 'ct 2/19/2026 20:24:51'!
+!SCuis methodsFor: 'evaluation' stamp: 'ct 3/8/2026 11:44:11'!
 evaluate
 	" I evaluate the given script (only the first script is evalued) "
 	| headMode daemonMode |
@@ -51,23 +51,32 @@ evaluate
 			content := ''.
 			script := args asFileEntry readStream.
 			[
-				[script atEnd] whileFalse: [
-					nextLine := script nextLine.
-					(nextLine beginsWith: '#!!') ifFalse: [
-						(nextLine beginsWith: 'SCuis require:') ifTrue: [
-							self processRequirement: nextLine.
-						] ifFalse: [
+				(headMode = 'yes') ifFalse: [
+					[script atEnd] whileFalse: [
+						nextLine := script nextLine.
+						(nextLine beginsWith: '#!!') ifFalse: [
+							(nextLine beginsWith: 'SCuis require:') ifTrue: [
+								self processRequirement: nextLine.
+							] ifFalse: [
+								content := content, (Character cr asString), nextLine.
+							].
+						].
+					].
+				
+					(content = '') ifFalse: [
+						self processContent: content.
+					].
+				] ifTrue: [
+					[script atEnd] whileFalse: [
+						nextLine := script nextLine.
+						(nextLine beginsWith: '#!!') ifFalse: [
 							content := content, (Character cr asString), nextLine.
 						].
 					].
-				].
-			
-				(content = '') ifFalse: [
-					(headMode = 'yes') ifTrue: [
+				
+					(content = '') ifFalse: [
 						Workspace new contents: content; openLabel: args.
-					] ifFalse: [
-						self processContent: content.
-					].
+					].				
 				].
 			]
 			ensure: [
