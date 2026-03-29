@@ -15,7 +15,7 @@ if [ "$1" = "-help" ]; then
 fi
 
 if [ "$1" = "-version" ]; then
-    echo "v0.2.2b"
+    echo "v0.3.1"
     exit 0
 fi
 
