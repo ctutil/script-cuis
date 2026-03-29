@@ -52,7 +52,7 @@ Run it with:
 [source,bash]
 cuis hello.st
 
-If you need the Smalltalk infrastructure you can run it in `head mode`. This will bring up the Smalltalk IDE and show your script. After changing it you can save it easily back to the file.
+If you need the Smalltalk infrastructure you can run it in `head mode` (`cuis -head hello.st`). This will bring up the Smalltalk IDE and show your script. After changing it you can save it easily back to the file.
 
 === Asciidoc mode
 
@@ -87,3 +87,34 @@ Try it with head:
 ----
 SCUIS_ADOC=README,c2 cuis -head
 ----
+
+=== Using dependencies and external libraries
+
+If an app needs external library (.so file on linux), you can put it into a lib
+directory on the same location where the apps run.
+
+For example, let's say you write the hello.st app and gyou have to use a myfirst.pck.st and it needs the libfirst.so,
+so your application directory will look like this:
+[ditaa]
+----
+myapp/
+  |
+  +- lib/
+  |  |
+  |  +- libfirst.so
+  |
+  +- myfirst.pck.st
+  +- hello.st
+----
+
+To use the dependent Smalltalk package you can use the `SCuis require: '...'` message:
+
+.hello.st
+[source,Smalltalk]
+----
+SCuis require: 'myfirst'.
+
+" Further code "
+----
+
+All requirements should be listed on the top of your script.
