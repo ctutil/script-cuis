@@ -52,7 +52,7 @@ fi
 export SCUIS_VM_ARGS="$*"
 
 SCUIS_APPDIR=$APPDIR
-#echo "sCuis appdir: $SCUIS_APPDIR"
+# echo "sCuis appdir: $SCUIS_APPDIR"
 # read
 
 export SCUIS_STATE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/cuis"
